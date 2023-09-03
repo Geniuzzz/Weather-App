@@ -77,7 +77,7 @@ fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = 
             }
         )
         CurrentLocationCard(locationName = viewState.locationName)
-        CurrentDataCard(Date())
+        CurrentDateCard(Date())
         CurrentTemperatureCard(viewState.temperature ?: 0.0, viewState.temperatureUnit ?: "-")
 
         LazyColumn(
@@ -144,7 +144,7 @@ fun TemperatureText(i: Double) {
 }
 
 @Composable
-fun CurrentDataCard(date: Date) {
+fun CurrentDateCard(date: Date) {
     val dateFormat = SimpleDateFormat("E, MMM dd", Locale.getDefault())
     Text(
         text = dateFormat.format(date),
