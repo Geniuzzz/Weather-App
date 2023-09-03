@@ -13,6 +13,11 @@ data class HomeScreenUIModel(
     val humidity: String?,
 ) {
     companion object {
+
+        fun defaultValues(): HomeScreenUIModel {
+            return HomeScreenUIModel("--", null, null, null, null, null)
+        }
+
         fun fromAPIResponse(weatherForecastResponse: WeatherForecastResponse): HomeScreenUIModel {
             val hourly = weatherForecastResponse.hourly
             val units = weatherForecastResponse.hourly_units

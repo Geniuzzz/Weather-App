@@ -1,4 +1,4 @@
-package com.eliq.weatherapp
+package com.eliq.weatherapp.utils
 
 import android.Manifest
 import android.content.Context
@@ -22,6 +22,10 @@ class LocationLiveData @Inject constructor(
 
     override fun onActive() {
         super.onActive()
+        getLastLocation()
+    }
+
+    fun getLastLocation(){
         if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION

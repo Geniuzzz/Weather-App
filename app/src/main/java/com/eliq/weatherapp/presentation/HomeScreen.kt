@@ -1,7 +1,5 @@
 package com.eliq.weatherapp.presentation
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,7 +14,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,8 +42,8 @@ import java.util.*
 @Composable
 fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = hiltViewModel()) {
 
-    val viewState = homeViewModel.weatherInfoState.value
-    val currentLocation = remember { mutableStateOf("") }
+    val viewState = homeViewModel.uiInfoState.value
+    val query = remember { mutableStateOf("") }
     val predictions = homeViewModel.geocodingSuggestions
 
     LaunchedEffect(Unit) {
@@ -66,17 +63,17 @@ fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = 
             .padding(16.dp)
     ) {
         QueryLocationTextField(
-            query = currentLocation.value,
+            query = query.value,
             predictions = predictions.value,
             onItemClick = {
-                currentLocation.value = it.getDisplayName()
+                query.value = it.getDisplayName()
                 homeViewModel.onSuggestionSelected(it)
             },
             onQueryChanged = {
-                currentLocation.value = it
+                query.value = it
             },
             onDoneActionClick = {
-                homeViewModel.fetchGeocodingResultsFor(currentLocation.value)
+                homeViewModel.fetchGeocodingResultsFor(query.value)
             }
         )
         CurrentLocationCard(locationName = viewState.locationName)

@@ -24,10 +24,8 @@ class HomeViewModel @Inject constructor(
         mutableStateOf(emptyList())
     val geocodingSuggestions: State<List<GeocodeResult>> = _geocodingSuggestions
 
-    private val _weatherInfoState: MutableState<HomeScreenUIModel> = mutableStateOf(
-        HomeScreenUIModel("--", null, null, null, null, null)
-    )
-    val weatherInfoState: State<HomeScreenUIModel> = _weatherInfoState
+    private val _uiInfoState: MutableState<HomeScreenUIModel> = mutableStateOf(HomeScreenUIModel.defaultValues())
+    val uiInfoState: State<HomeScreenUIModel> = _uiInfoState
 
 
     fun fetchGeocodingResultsFor(name: String) {
@@ -51,7 +49,7 @@ class HomeViewModel @Inject constructor(
                 )
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _weatherInfoState.value = HomeScreenUIModel.fromAPIResponse(it).copy(
+                        _uiInfoState.value = HomeScreenUIModel.fromAPIResponse(it).copy(
                             locationName = geocodeResult.getDisplayName()
                         )
                     }
@@ -68,8 +66,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun fetchDataForCurrentLocation(locationDetails: LocationDetails) {
-        fetchWeather(GeocodeResult(
+        fetchWeather(
+            GeocodeResult(
             longitude = locationDetails.longitude, latitude = locationDetails.latitude, name = "--", "", ""
-        ))
+        )
+        )
     }
 }
