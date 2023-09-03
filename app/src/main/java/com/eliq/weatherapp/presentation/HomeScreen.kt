@@ -18,17 +18,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.eliq.weatherapp.R
 import com.eliq.weatherapp.models.WeatherComponent
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
+
+    val viewState = homeViewModel.weatherInfoState.value
+
     Column(
         modifier = Modifier
             .background(
@@ -41,18 +43,28 @@ fun HomeScreen() {
             )
             .padding(16.dp)
     ) {
-        CurrentLocationCard(locationName = "Stockholm,\nSweden")
+        CurrentLocationCard(locationName = viewState.locationName)
         CurrentDataCard(Date())
-        CurrentWeatherCard()
+        CurrentTemperatureCard(viewState.temperature ?: 0.0, viewState.temperatureUnit ?: "-")
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(listOf(
-                WeatherComponent("Rainfall", R.drawable.icon_rainfall, "3cm"),
-                WeatherComponent("Wind", R.drawable.icon_wind, "19km/h"),
-                WeatherComponent("Humidity", R.drawable.icon_humidity, "64%"),
-            )){
+            items(
+                listOf(
+                    WeatherComponent(
+                        "Rainfall",
+                        R.drawable.icon_rainfall,
+                        viewState.rainfall ?: "-"
+                    ),
+                    WeatherComponent("Wind", R.drawable.icon_wind, viewState.windSpeed ?: "-"),
+                    WeatherComponent(
+                        "Humidity",
+                        R.drawable.icon_humidity,
+                        viewState.humidity ?: "-"
+                    ),
+                )
+            ) {
                 WeatherComponentCard(it)
             }
         }
@@ -60,15 +72,15 @@ fun HomeScreen() {
 }
 
 @Composable
-fun CurrentWeatherCard() {
+fun CurrentTemperatureCard(temp: Double, unit: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
     ) {
         Row {
-            TemperatureText(19)
-            UnitText("°c")
+            TemperatureText(temp)
+            UnitText(unit)
         }
     }
 }
@@ -86,7 +98,7 @@ fun UnitText(s: String) {
 }
 
 @Composable
-fun TemperatureText(i: Int) {
+fun TemperatureText(i: Double) {
     Text(
         text = "$i",
         style = TextStyle(
@@ -136,7 +148,7 @@ fun WeatherComponentCard(weatherComponent: WeatherComponent) {
             )
             .padding(0.5.dp)
             .background(color = Color(0x5CFFFFFF), shape = RoundedCornerShape(size = 10.dp))
-            .padding(start = 12.dp, top = 8.dp, end = 12 .dp, bottom = 8.dp),
+            .padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
