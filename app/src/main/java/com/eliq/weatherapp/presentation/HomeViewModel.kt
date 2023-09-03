@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.eliq.weatherapp.data.remote.GeocodingApiService
 import com.eliq.weatherapp.data.remote.WeatherForecastApiService
 import com.eliq.weatherapp.models.GeocodeResult
+import com.eliq.weatherapp.models.LocationDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +28,7 @@ class HomeViewModel @Inject constructor(
         HomeScreenUIModel("--", null, null, null, null, null)
     )
     val weatherInfoState: State<HomeScreenUIModel> = _weatherInfoState
+
 
     fun fetchGeocodingResultsFor(name: String) {
         viewModelScope.launch {
@@ -63,5 +65,11 @@ class HomeViewModel @Inject constructor(
     fun onSuggestionSelected(geocodeResult: GeocodeResult) {
         _geocodingSuggestions.value = listOf()
         fetchWeather(geocodeResult)
+    }
+
+    fun fetchDataForCurrentLocation(locationDetails: LocationDetails) {
+        fetchWeather(GeocodeResult(
+            longitude = locationDetails.longitude, latitude = locationDetails.latitude, name = "--", "", ""
+        ))
     }
 }

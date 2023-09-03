@@ -15,7 +15,7 @@ data class GeocodeResult(
     fun getDisplayName(): String {
         val sb = StringBuilder()
         sb.append(name)
-        admin1?.let {
+        admin1?.takeIf { it.isNotEmpty() }?.let {
             sb.append(",$it")
         }
         country.takeIf { it.isNotEmpty() }?.let {

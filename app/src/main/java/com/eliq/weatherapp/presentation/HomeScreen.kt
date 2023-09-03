@@ -1,5 +1,7 @@
 package com.eliq.weatherapp.presentation
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +15,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,16 +37,21 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eliq.weatherapp.R
 import com.eliq.weatherapp.models.GeocodeResult
+import com.eliq.weatherapp.models.LocationDetails
 import com.eliq.weatherapp.models.WeatherComponent
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = hiltViewModel()) {
 
     val viewState = homeViewModel.weatherInfoState.value
     val currentLocation = remember { mutableStateOf("") }
     val predictions = homeViewModel.geocodingSuggestions
+
+    LaunchedEffect(Unit) {
+        homeViewModel.fetchDataForCurrentLocation(locationDetails)
+    }
 
     Column(
         modifier = Modifier
@@ -243,8 +252,8 @@ fun QueryLocationTextField(
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable {
-                        onItemClick(it)
-                    },
+                            onItemClick(it)
+                        },
                     text = it.getDisplayName()
                 )
             }
