@@ -43,12 +43,33 @@ import java.util.*
 fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = hiltViewModel()) {
 
     val viewState = homeViewModel.uiInfoState.value
-    val query = remember { mutableStateOf("") }
     val predictions = homeViewModel.geocodingSuggestions
 
     LaunchedEffect(Unit) {
         homeViewModel.fetchDataForCurrentLocation(locationDetails)
     }
+
+    HomeScreenUI(
+        uiModel = viewState,
+        predictions = predictions.value,
+        onDoneActionClick = {
+            homeViewModel.fetchGeocodingResultsFor(it)
+        },
+        onSuggestionItemClick = {
+            homeViewModel.onSuggestionSelected(it)
+        }
+    )
+}
+
+
+@Composable
+fun HomeScreenUI(
+    uiModel: HomeScreenUIModel,
+    predictions: List<GeocodeResult>,
+    onDoneActionClick: (String) -> Unit,
+    onSuggestionItemClick: (GeocodeResult) -> Unit
+) {
+    val query = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -64,21 +85,21 @@ fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = 
     ) {
         QueryLocationTextField(
             query = query.value,
-            predictions = predictions.value,
+            predictions = predictions,
             onItemClick = {
                 query.value = it.getDisplayName()
-                homeViewModel.onSuggestionSelected(it)
+                onSuggestionItemClick(it)
             },
             onQueryChanged = {
                 query.value = it
             },
             onDoneActionClick = {
-                homeViewModel.fetchGeocodingResultsFor(query.value)
+                onDoneActionClick(query.value)
             }
         )
-        CurrentLocationCard(locationName = viewState.locationName)
+        CurrentLocationCard(locationName = uiModel.locationName)
         CurrentDateCard(Date())
-        CurrentTemperatureCard(viewState.temperature ?: 0.0, viewState.temperatureUnit ?: "-")
+        CurrentTemperatureCard(uiModel.temperature ?: 0.0, uiModel.temperatureUnit ?: "-")
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -88,13 +109,13 @@ fun HomeScreen(locationDetails: LocationDetails, homeViewModel: HomeViewModel = 
                     WeatherComponent(
                         "Rainfall",
                         R.drawable.icon_rainfall,
-                        viewState.rainfall ?: "-"
+                        uiModel.rainfall ?: "-"
                     ),
-                    WeatherComponent("Wind", R.drawable.icon_wind, viewState.windSpeed ?: "-"),
+                    WeatherComponent("Wind", R.drawable.icon_wind, uiModel.windSpeed ?: "-"),
                     WeatherComponent(
                         "Humidity",
                         R.drawable.icon_humidity,
-                        viewState.humidity ?: "-"
+                        uiModel.humidity ?: "-"
                     ),
                 )
             ) {
